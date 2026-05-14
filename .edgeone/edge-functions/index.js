@@ -202,12 +202,12 @@ ${projectName}\u5B9A\u4F4D\u4E3A${projectType}\u9879\u76EE\uFF0C\u89C4\u5212\u75
               (() => {
   // functions/api/cases.js
   var DEFAULT_CASES = [
-    { id: "coast", name: "\u6EE8\u6D77\u666F\u89C2\u516C\u56ED", tag: "\u70ED\u95E8", meta: "12 \u5F20\u5E7B\u706F\u7247 \xB7 \u542B\u5E73\u9762\u56FE \xB7 \u542B\u6548\u679C\u56FE", img: "/assets/tmpl-coast.jpg" },
-    { id: "playground", name: "\u513F\u7AE5\u53CB\u597D\u4E50\u56ED", tag: "\u7CBE\u9009", meta: "10 \u5F20\u5E7B\u706F\u7247 \xB7 \u542B\u8272\u5F69\u65B9\u6848 \xB7 \u542B\u8BBE\u65BD\u6E05\u5355", img: "/assets/tmpl-playground.jpg" },
-    { id: "pocket", name: "\u57CE\u5E02\u53E3\u888B\u516C\u56ED", tag: null, meta: "14 \u5F20\u5E7B\u706F\u7247 \xB7 \u542B\u529F\u80FD\u5206\u6790 \xB7 \u542B\u690D\u7269\u914D\u7F6E", img: "/assets/tmpl-pocket.jpg" },
-    { id: "commercial", name: "\u5546\u4E1A\u8857\u533A\u666F\u89C2", tag: "\u65B0\u54C1", meta: "16 \u5F20\u5E7B\u706F\u7247 \xB7 \u542B\u591C\u666F\u65B9\u6848 \xB7 \u542B\u94FA\u88C5\u7EC6\u8282", img: "/assets/tmpl-commercial.jpg" },
-    { id: "community", name: "\u793E\u533A\u5C45\u4F4F\u666F\u89C2", tag: null, meta: "12 \u5F20\u5E7B\u706F\u7247 \xB7 \u542B\u56DB\u5B63\u53D8\u5316 \xB7 \u542B\u704C\u6E89\u7CFB\u7EDF", img: "/assets/tmpl-community.jpg" },
-    { id: "wetland", name: "\u751F\u6001\u6E7F\u5730\u4FEE\u590D", tag: "\u7CBE\u9009", meta: "18 \u5F20\u5E7B\u706F\u7247 \xB7 \u542B\u751F\u6001\u5206\u6790 \xB7 \u542B\u6C34\u6587\u8BBE\u8BA1", img: "/assets/tmpl-wetland.jpg" }
+    { id: "coast", name: "\u6EE8\u6D77\u666F\u89C2\u516C\u56ED", tag: "\u70ED\u95E8", meta: "12 \u5F20\u5E7B\u706F\u7247 \xB7 \u542B\u5E73\u9762\u56FE \xB7 \u542B\u6548\u679C\u56FE", img: "assets/tmpl-coast.jpg" },
+    { id: "playground", name: "\u513F\u7AE5\u53CB\u597D\u4E50\u56ED", tag: "\u7CBE\u9009", meta: "10 \u5F20\u5E7B\u706F\u7247 \xB7 \u542B\u8272\u5F69\u65B9\u6848 \xB7 \u542B\u8BBE\u65BD\u6E05\u5355", img: "assets/tmpl-playground.jpg" },
+    { id: "pocket", name: "\u57CE\u5E02\u53E3\u888B\u516C\u56ED", tag: null, meta: "14 \u5F20\u5E7B\u706F\u7247 \xB7 \u542B\u529F\u80FD\u5206\u6790 \xB7 \u542B\u690D\u7269\u914D\u7F6E", img: "assets/tmpl-pocket.jpg" },
+    { id: "commercial", name: "\u5546\u4E1A\u8857\u533A\u666F\u89C2", tag: "\u65B0\u54C1", meta: "16 \u5F20\u5E7B\u706F\u7247 \xB7 \u542B\u591C\u666F\u65B9\u6848 \xB7 \u542B\u94FA\u88C5\u7EC6\u8282", img: "assets/tmpl-commercial.jpg" },
+    { id: "community", name: "\u793E\u533A\u5C45\u4F4F\u666F\u89C2", tag: null, meta: "12 \u5F20\u5E7B\u706F\u7247 \xB7 \u542B\u56DB\u5B63\u53D8\u5316 \xB7 \u542B\u704C\u6E89\u7CFB\u7EDF", img: "assets/tmpl-community.jpg" },
+    { id: "wetland", name: "\u751F\u6001\u6E7F\u5730\u4FEE\u590D", tag: "\u7CBE\u9009", meta: "18 \u5F20\u5E7B\u706F\u7247 \xB7 \u542B\u751F\u6001\u5206\u6790 \xB7 \u542B\u6C34\u6587\u8BBE\u8BA1", img: "assets/tmpl-wetland.jpg" }
   ];
   async function onRequest({ request }) {
     let cases = DEFAULT_CASES;

@@ -471,7 +471,52 @@
     <h2 class="section-title reveal">专业模板，覆盖核心场景</h2>
     <p class="section-sub reveal">6 类景观项目模板，开箱即用</p>
     <div class="tmpl-grid" id="tmplGrid">
-      <div class="tmpl-loading">正在加载模板库…</div>
+      <div class="tmpl-card reveal">
+        <img class="tmpl-img" src="assets/tmpl-coast.jpg" alt="滨海景观公园" loading="lazy" />
+        <div class="tmpl-body">
+          <div class="tmpl-tag">热门</div>
+          <div class="tmpl-name">滨海景观公园</div>
+          <div class="tmpl-meta">12 张幻灯片 · 含平面图 · 含效果图</div>
+        </div>
+      </div>
+      <div class="tmpl-card reveal">
+        <img class="tmpl-img" src="assets/tmpl-playground.jpg" alt="儿童友好乐园" loading="lazy" />
+        <div class="tmpl-body">
+          <div class="tmpl-tag">精选</div>
+          <div class="tmpl-name">儿童友好乐园</div>
+          <div class="tmpl-meta">10 张幻灯片 · 含色彩方案 · 含设施清单</div>
+        </div>
+      </div>
+      <div class="tmpl-card reveal">
+        <img class="tmpl-img" src="assets/tmpl-pocket.jpg" alt="城市口袋公园" loading="lazy" />
+        <div class="tmpl-body">
+          <div class="tmpl-name">城市口袋公园</div>
+          <div class="tmpl-meta">14 张幻灯片 · 含功能分析 · 含植物配置</div>
+        </div>
+      </div>
+      <div class="tmpl-card reveal">
+        <img class="tmpl-img" src="assets/tmpl-commercial.jpg" alt="商业街区景观" loading="lazy" />
+        <div class="tmpl-body">
+          <div class="tmpl-tag">新品</div>
+          <div class="tmpl-name">商业街区景观</div>
+          <div class="tmpl-meta">16 张幻灯片 · 含夜景方案 · 含铺装细节</div>
+        </div>
+      </div>
+      <div class="tmpl-card reveal">
+        <img class="tmpl-img" src="assets/tmpl-community.jpg" alt="社区居住景观" loading="lazy" />
+        <div class="tmpl-body">
+          <div class="tmpl-name">社区居住景观</div>
+          <div class="tmpl-meta">12 张幻灯片 · 含四季变化 · 含灌溉系统</div>
+        </div>
+      </div>
+      <div class="tmpl-card reveal">
+        <img class="tmpl-img" src="assets/tmpl-wetland.jpg" alt="生态湿地修复" loading="lazy" />
+        <div class="tmpl-body">
+          <div class="tmpl-tag">精选</div>
+          <div class="tmpl-name">生态湿地修复</div>
+          <div class="tmpl-meta">18 张幻灯片 · 含生态分析 · 含水文设计</div>
+        </div>
+      </div>
     </div>
   </div>
 </section>
@@ -632,13 +677,20 @@ function renderTemplates(cases) {
 }
 
 async function loadTemplates() {
+  renderTemplates(DEFAULT_CASES);
+
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 2000);
+
   try {
-    const res = await fetch('/api/cases');
+    const res = await fetch('/api/cases', { signal: controller.signal });
     const data = await res.json();
     if (!data.success || !data.cases) throw new Error('no data');
     renderTemplates(data.cases);
   } catch(e) {
     renderTemplates(DEFAULT_CASES);
+  } finally {
+    clearTimeout(timeout);
   }
 }
 loadTemplates();

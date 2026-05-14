@@ -1,0 +1,14 @@
+{
+  "functions": [
+    {
+      "path": "/api/brief",
+      "method": ["POST"],
+      "description": "AI 生成项目说明"
+    },
+    {
+      "path": "/api/cases",
+      "method": ["GET"],
+      "description": "读取案例库"
+    }
+  ]
+}

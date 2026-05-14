@@ -1,0 +1,14 @@
+{
+  "routes": [
+    {
+      "src": "^/_middleware$"
+    },
+    {
+      "src": "^/api/brief$"
+    },
+    {
+      "src": "^/api/cases$"
+    }
+  ],
+  "middleware": null
+}

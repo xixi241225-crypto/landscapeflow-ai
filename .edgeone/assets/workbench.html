@@ -1,0 +1,722 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>工作台 — LandscapeFlow AI</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg: #0A0A0A;
+      --green: #22C55E;
+      --green-glow: rgba(34,197,94,0.4);
+      --white: #FFFFFF;
+      --white-60: rgba(255,255,255,0.60);
+      --white-30: rgba(255,255,255,0.30);
+      --border: rgba(255,255,255,0.10);
+      --card-bg: rgba(255,255,255,0.06);
+      --panel-bg: rgba(255,255,255,0.03);
+      --font-serif: 'Playfair Display', Georgia, serif;
+      --font-sans: 'DM Sans', system-ui, sans-serif;
+    }
+    html, body { height: 100%; }
+    body { background: var(--bg); color: var(--white); font-family: var(--font-sans); overflow-x: hidden; }
+
+    /* ── TOP NAV ── */
+    .wb-nav {
+      height: 60px; display: flex; align-items: center; justify-content: space-between;
+      padding: 0 32px;
+      background: rgba(10,10,10,0.90);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--border);
+      position: sticky; top: 0; z-index: 50;
+    }
+    .wb-nav-logo { font-family: var(--font-serif); font-size: 17px; font-weight: 600; color: var(--white); text-decoration: none; display: flex; align-items: center; gap: 8px; }
+    .wb-nav-title { font-size: 14px; color: var(--white-30); }
+    .wb-nav-right { display: flex; align-items: center; gap: 12px; }
+    .badge-ai {
+      font-size: 11px; padding: 3px 10px; border-radius: 12px;
+      background: rgba(34,197,94,0.15); color: var(--green);
+      border: 1px solid rgba(34,197,94,0.3);
+    }
+    .btn-back {
+      font-size: 13px; color: var(--white-60); text-decoration: none;
+      padding: 6px 14px; border-radius: 8px; border: 1px solid var(--border);
+      transition: all 0.2s;
+    }
+    .btn-back:hover { color: var(--white); border-color: var(--white-30); }
+
+    /* ── STEP TABS ── */
+    .step-tabs {
+      display: flex; align-items: stretch;
+      border-bottom: 1px solid var(--border);
+      overflow-x: auto; scrollbar-width: none;
+      background: rgba(255,255,255,0.02);
+    }
+    .step-tabs::-webkit-scrollbar { display: none; }
+    .step-tab {
+      flex-shrink: 0; display: flex; align-items: center; gap: 10px;
+      padding: 0 28px; height: 56px;
+      font-size: 13px; font-weight: 400; color: var(--white-30);
+      cursor: pointer; border: none; background: transparent;
+      border-bottom: 2px solid transparent;
+      transition: all 0.2s; white-space: nowrap;
+    }
+    .step-tab:hover { color: var(--white-60); }
+    .step-tab.active { color: var(--white); border-bottom-color: var(--green); }
+    .step-num {
+      font-family: var(--font-serif); font-size: 20px; font-weight: 700;
+      color: rgba(34,197,94,0.3); line-height: 1;
+    }
+    .step-tab.active .step-num { color: var(--green); }
+
+    /* ── MAIN LAYOUT ── */
+    .wb-main { display: flex; height: calc(100vh - 60px - 56px); }
+    .wb-panel-left {
+      width: 380px; flex-shrink: 0;
+      border-right: 1px solid var(--border);
+      display: flex; flex-direction: column;
+      overflow-y: auto;
+    }
+    .wb-panel-right { flex: 1; overflow-y: auto; }
+
+    /* ── PANEL CONTENT ── */
+    .panel-header {
+      padding: 28px 28px 0;
+    }
+    .panel-title { font-family: var(--font-serif); font-size: 22px; font-weight: 600; color: var(--white); margin-bottom: 6px; }
+    .panel-desc { font-size: 13px; color: var(--white-30); line-height: 1.6; }
+    .panel-body { padding: 20px 28px 28px; flex: 1; }
+    .panel-section { margin-bottom: 20px; }
+    .form-label { font-size: 12px; color: var(--white-30); margin-bottom: 8px; display: block; letter-spacing: 0.08em; text-transform: uppercase; }
+    .form-input, .form-select, .form-textarea {
+      width: 100%; padding: 10px 14px;
+      background: rgba(255,255,255,0.05); border: 1px solid var(--border);
+      border-radius: 8px; color: var(--white);
+      font-family: var(--font-sans); font-size: 14px;
+      outline: none; transition: border-color 0.2s;
+    }
+    .form-input:focus, .form-select:focus, .form-textarea:focus { border-color: rgba(34,197,94,0.5); }
+    .form-select option { background: #1a1a1a; }
+    .form-textarea { resize: vertical; min-height: 88px; }
+    .btn-run {
+      width: 100%; padding: 12px;
+      background: linear-gradient(135deg, #16A34A, #22C55E);
+      color: #fff; font-family: var(--font-sans); font-size: 14px; font-weight: 500;
+      border: none; border-radius: 10px; cursor: pointer;
+      transition: opacity 0.2s; box-shadow: 0 0 20px rgba(34,197,94,0.3);
+      margin-top: 8px;
+    }
+    .btn-run:hover { opacity: 0.88; }
+    .btn-run:disabled { opacity: 0.4; cursor: not-allowed; }
+
+    /* ── RIGHT PANEL ── */
+    .result-area { padding: 32px; }
+    .result-area-title { font-size: 11px; color: var(--white-30); letter-spacing: 0.12em; text-transform: uppercase; margin-bottom: 20px; }
+
+    /* ── STEP 1 RIGHT ── */
+    .condition-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    .condition-card {
+      background: var(--card-bg); border: 1px solid var(--border);
+      border-radius: 12px; padding: 20px;
+    }
+    .condition-label { font-size: 11px; color: var(--green); text-transform: uppercase; letter-spacing: 0.12em; margin-bottom: 8px; }
+    .condition-val { font-size: 14px; color: var(--white); line-height: 1.55; }
+
+    /* ── STEP 2 RIGHT: concept cards ── */
+    .concept-grid { display: grid; gap: 16px; }
+    .concept-card {
+      background: var(--card-bg); border: 1px solid var(--border);
+      border-radius: 12px; padding: 24px;
+      transition: border-color 0.2s;
+    }
+    .concept-card:hover { border-color: rgba(34,197,94,0.3); }
+    .concept-angle { font-size: 11px; color: var(--green); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 8px; }
+    .concept-text { font-size: 14px; color: var(--white-60); line-height: 1.65; }
+
+    /* ── STEP 3 RIGHT: scheme options ── */
+    .scheme-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 16px; }
+    .scheme-card {
+      background: var(--card-bg); border: 1px solid var(--border);
+      border-radius: 12px; padding: 24px; cursor: pointer;
+      transition: all 0.2s;
+    }
+    .scheme-card:hover, .scheme-card.selected { border-color: rgba(34,197,94,0.5); box-shadow: 0 0 24px rgba(34,197,94,0.15); }
+    .scheme-id { font-family: var(--font-serif); font-size: 32px; color: rgba(34,197,94,0.25); margin-bottom: 12px; }
+    .scheme-name { font-size: 16px; font-weight: 500; color: var(--white); margin-bottom: 8px; }
+    .scheme-desc { font-size: 13px; color: var(--white-60); line-height: 1.6; margin-bottom: 14px; }
+    .scheme-risk { font-size: 12px; color: rgba(255,200,100,0.7); }
+
+    /* ── STEP 4 RIGHT: space layout ── */
+    .space-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    .space-card {
+      background: var(--card-bg); border: 1px solid var(--border);
+      border-radius: 12px; padding: 20px;
+    }
+    .space-card-title { font-size: 13px; font-weight: 500; color: var(--green); margin-bottom: 12px; }
+    .space-list { list-style: none; }
+    .space-list li { font-size: 13px; color: var(--white-60); padding: 6px 0; border-bottom: 1px solid var(--border); line-height: 1.5; }
+    .space-list li:last-child { border-bottom: none; }
+    .space-list li::before { content: '→ '; color: var(--green); }
+
+    /* ── STEP 5 RIGHT: viz grid ── */
+    .viz-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 16px; }
+    .viz-card {
+      background: var(--card-bg); border: 1px solid var(--border);
+      border-radius: 12px; overflow: hidden;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .viz-card:hover { transform: translateY(-3px); box-shadow: 0 0 24px var(--green-glow); }
+    .viz-img { width: 100%; height: 160px; object-fit: cover; display: block; background: #111; }
+    .viz-footer { padding: 12px 14px; display: flex; align-items: center; justify-content: space-between; }
+    .viz-title { font-size: 12px; color: var(--white-60); }
+    .viz-tag { font-size: 11px; padding: 2px 8px; border-radius: 8px; background: rgba(34,197,94,0.12); color: var(--green); border: 1px solid rgba(34,197,94,0.25); }
+
+    /* ── STEP 6 RIGHT: output ── */
+    .output-cards { display: grid; grid-template-columns: repeat(3,1fr); gap: 16px; }
+    .output-card {
+      background: var(--card-bg); border: 1px solid var(--border);
+      border-radius: 12px; padding: 24px; text-align: center;
+      transition: all 0.2s; cursor: pointer;
+    }
+    .output-card:hover { border-color: rgba(34,197,94,0.4); transform: translateY(-2px); }
+    .output-icon { font-size: 32px; margin-bottom: 12px; }
+    .output-name { font-size: 15px; font-weight: 500; color: var(--white); margin-bottom: 6px; }
+    .output-desc { font-size: 12px; color: var(--white-30); line-height: 1.5; }
+    .output-btn {
+      margin-top: 14px; padding: 7px 16px;
+      border-radius: 8px; border: 1px solid rgba(34,197,94,0.4);
+      background: rgba(34,197,94,0.08); color: var(--green);
+      font-size: 12px; cursor: pointer; transition: all 0.2s;
+    }
+    .output-btn:hover { background: rgba(34,197,94,0.18); }
+
+    /* Empty placeholder */
+    .empty-state {
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      height: 100%; min-height: 300px; gap: 12px;
+      color: var(--white-30); font-size: 14px; text-align: center;
+    }
+    .empty-state svg { opacity: 0.25; }
+
+    /* Step visibility */
+    .step-panel { display: none; }
+    .step-panel.active { display: flex; height: 100%; }
+
+    @media (max-width: 768px) {
+      .wb-main { flex-direction: column; height: auto; }
+      .wb-panel-left { width: 100%; border-right: none; border-bottom: 1px solid var(--border); }
+      .viz-grid, .output-cards, .scheme-grid { grid-template-columns: 1fr; }
+      .space-grid, .condition-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav class="wb-nav">
+  <a href="/" class="wb-nav-logo"><span>🌿</span> LandscapeFlow AI</a>
+  <span class="wb-nav-title">工作台</span>
+  <div class="wb-nav-right">
+    <span class="badge-ai">AI 驱动</span>
+    <a href="/" class="btn-back">← 返回首页</a>
+  </div>
+</nav>
+
+<!-- STEP TABS -->
+<div class="step-tabs" id="stepTabs">
+  <button class="step-tab active" data-step="1"><span class="step-num">01</span>项目定义</button>
+  <button class="step-tab" data-step="2"><span class="step-num">02</span>概念生成</button>
+  <button class="step-tab" data-step="3"><span class="step-num">03</span>方案选择</button>
+  <button class="step-tab" data-step="4"><span class="step-num">04</span>空间推演</button>
+  <button class="step-tab" data-step="5"><span class="step-num">05</span>视觉表达</button>
+  <button class="step-tab" data-step="6"><span class="step-num">06</span>输出成果</button>
+</div>
+
+<!-- MAIN -->
+<div class="wb-main">
+
+  <!-- ── STEP 1: 项目定义 ── -->
+  <div class="step-panel active" id="step1">
+    <div class="wb-panel-left">
+      <div class="panel-header">
+        <div class="panel-title">项目定义</div>
+        <div class="panel-desc">建立项目基本条件，AI 将据此生成后续设计依据</div>
+      </div>
+      <div class="panel-body">
+        <div class="panel-section">
+          <label class="form-label">项目名称</label>
+          <input class="form-input" id="s1-name" type="text" placeholder="例：滨江休闲带景观改造" />
+        </div>
+        <div class="panel-section">
+          <label class="form-label">项目类型</label>
+          <select class="form-select" id="s1-type">
+            <option>滨水景观</option><option>城市公园</option><option>社区绿地</option>
+            <option>商业街区</option><option>儿童乐园</option><option>生态修复</option>
+          </select>
+        </div>
+        <div class="panel-section">
+          <label class="form-label">场地面积（㎡）</label>
+          <input class="form-input" id="s1-area" type="text" placeholder="例：12000" />
+        </div>
+        <div class="panel-section">
+          <label class="form-label">目标人群</label>
+          <input class="form-input" id="s1-user" type="text" placeholder="例：周边 3 万居民，以家庭为主" />
+        </div>
+        <div class="panel-section">
+          <label class="form-label">设计目标</label>
+          <textarea class="form-textarea" id="s1-goal" placeholder="例：修复硬质驳岸，提升亲水性，打造全龄友好公共空间"></textarea>
+        </div>
+        <button class="btn-run" onclick="runStep1()">✦ AI 解析项目条件</button>
+      </div>
+    </div>
+    <div class="wb-panel-right">
+      <div class="result-area" id="s1-result">
+        <div class="result-area-title">项目条件解析</div>
+        <div class="empty-state">
+          <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><rect x="3" y="3" width="18" height="18" rx="3"/><path d="M9 9h6M9 12h6M9 15h4"/></svg>
+          <span>填写左侧信息后点击"AI 解析"</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── STEP 2: 概念生成 ── -->
+  <div class="step-panel" id="step2">
+    <div class="wb-panel-left">
+      <div class="panel-header">
+        <div class="panel-title">概念生成</div>
+        <div class="panel-desc">从气候、人群、矛盾、案例四角度建立设计依据</div>
+      </div>
+      <div class="panel-body">
+        <div class="panel-section">
+          <label class="form-label">场地气候特征</label>
+          <input class="form-input" id="s2-climate" type="text" placeholder="例：夏热冬冷，年均降水 1200mm" />
+        </div>
+        <div class="panel-section">
+          <label class="form-label">主要矛盾</label>
+          <textarea class="form-textarea" id="s2-conflict" placeholder="例：硬质驳岸阻断人与水的关系；现有植物配置单一，季相效果差"></textarea>
+        </div>
+        <div class="panel-section">
+          <label class="form-label">参考案例风格</label>
+          <select class="form-select" id="s2-ref">
+            <option>自然生态风</option><option>现代简约风</option><option>新中式风</option><option>工业改造风</option>
+          </select>
+        </div>
+        <button class="btn-run" onclick="runStep2()">✦ 生成设计概念</button>
+      </div>
+    </div>
+    <div class="wb-panel-right">
+      <div class="result-area" id="s2-result">
+        <div class="result-area-title">设计概念分析</div>
+        <div class="empty-state">
+          <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg>
+          <span>填写信息后点击生成概念</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── STEP 3: 方案选择 ── -->
+  <div class="step-panel" id="step3">
+    <div class="wb-panel-left">
+      <div class="panel-header">
+        <div class="panel-title">方案选择</div>
+        <div class="panel-desc">三个差异化概念方向，选择你的设计路径</div>
+      </div>
+      <div class="panel-body">
+        <div class="panel-section">
+          <label class="form-label">设计侧重</label>
+          <select class="form-select" id="s3-focus">
+            <option>生态优先</option><option>活动优先</option><option>美学优先</option><option>经济优先</option>
+          </select>
+        </div>
+        <div class="panel-section">
+          <label class="form-label">预算级别</label>
+          <select class="form-select" id="s3-budget">
+            <option>经济型（500元/㎡以内）</option><option>标准型（500-1500元/㎡）</option><option>高端型（1500元/㎡以上）</option>
+          </select>
+        </div>
+        <button class="btn-run" onclick="runStep3()">✦ 生成三个方案方向</button>
+      </div>
+    </div>
+    <div class="wb-panel-right">
+      <div class="result-area" id="s3-result">
+        <div class="result-area-title">方案选择</div>
+        <div class="empty-state">
+          <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><path d="M4 6h16M4 12h10M4 18h6"/></svg>
+          <span>生成三个可选方案方向</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── STEP 4: 空间推演 ── -->
+  <div class="step-panel" id="step4">
+    <div class="wb-panel-left">
+      <div class="panel-header">
+        <div class="panel-title">空间推演</div>
+        <div class="panel-desc">平面布局、流线、竖向、植物结构全面推演</div>
+      </div>
+      <div class="panel-body">
+        <div class="panel-section">
+          <label class="form-label">功能分区数量</label>
+          <select class="form-select" id="s4-zones">
+            <option>3 个主功能区</option><option>4 个主功能区</option><option>5 个主功能区</option><option>6 个主功能区</option>
+          </select>
+        </div>
+        <div class="panel-section">
+          <label class="form-label">主要流线类型</label>
+          <select class="form-select" id="s4-flow">
+            <option>步行为主</option><option>步行+骑行</option><option>全龄无障碍</option>
+          </select>
+        </div>
+        <div class="panel-section">
+          <label class="form-label">植物配置策略</label>
+          <select class="form-select" id="s4-plant">
+            <option>季相丰富型</option><option>低维护本土型</option><option>芳香疗愈型</option>
+          </select>
+        </div>
+        <button class="btn-run" onclick="runStep4()">✦ 生成空间推演方案</button>
+      </div>
+    </div>
+    <div class="wb-panel-right">
+      <div class="result-area" id="s4-result">
+        <div class="result-area-title">空间推演结果</div>
+        <div class="empty-state">
+          <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><rect x="3" y="3" width="8" height="8" rx="1"/><rect x="13" y="3" width="8" height="8" rx="1"/><rect x="3" y="13" width="8" height="8" rx="1"/><rect x="13" y="13" width="8" height="8" rx="1"/></svg>
+          <span>配置参数后生成空间布局</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── STEP 5: 视觉表达 ── -->
+  <div class="step-panel" id="step5">
+    <div class="wb-panel-left">
+      <div class="panel-header">
+        <div class="panel-title">视觉表达</div>
+        <div class="panel-desc">节点透视、鸟瞰、效果图、材料板</div>
+      </div>
+      <div class="panel-body">
+        <div class="panel-section">
+          <label class="form-label">渲染风格</label>
+          <select class="form-select" id="s5-style">
+            <option>写实摄影风</option><option>手绘概念风</option><option>水彩插画风</option><option>建筑表现图风</option>
+          </select>
+        </div>
+        <div class="panel-section">
+          <label class="form-label">时段</label>
+          <select class="form-select" id="s5-time">
+            <option>白天（自然光）</option><option>黄昏（暖金光）</option><option>夜景（灯光）</option>
+          </select>
+        </div>
+        <div class="panel-section">
+          <label class="form-label">季节</label>
+          <select class="form-select" id="s5-season">
+            <option>春季（花期）</option><option>夏季（茂盛）</option><option>秋季（金叶）</option><option>冬季（简洁）</option>
+          </select>
+        </div>
+        <button class="btn-run" id="s5-btn" onclick="runStep5()">✦ 生成视觉效果图</button>
+      </div>
+    </div>
+    <div class="wb-panel-right">
+      <div class="result-area">
+        <div class="result-area-title">视觉效果图</div>
+        <div class="viz-grid" id="vizGrid">
+          <!-- 默认展示本地图片 -->
+          <div class="viz-card">
+            <img class="viz-img" src="/assets/viz-aerial.jpg" alt="社区公园鸟瞰效果图" loading="lazy" />
+            <div class="viz-footer"><span class="viz-title">社区公园鸟瞰效果图</span><span class="viz-tag">鸟瞰</span></div>
+          </div>
+          <div class="viz-card">
+            <img class="viz-img" src="/assets/viz-plan.jpg" alt="总平面图 · 含功能分区" loading="lazy" />
+            <div class="viz-footer"><span class="viz-title">总平面图 · 含功能分区</span><span class="viz-tag">平面</span></div>
+          </div>
+          <div class="viz-card">
+            <img class="viz-img" src="/assets/viz-night.jpg" alt="夜景灯光效果图" loading="lazy" />
+            <div class="viz-footer"><span class="viz-title">夜景灯光效果图</span><span class="viz-tag">夜景</span></div>
+          </div>
+          <div class="viz-card">
+            <img class="viz-img" src="/assets/viz-playground.jpg" alt="儿童游乐区节点透视" loading="lazy" />
+            <div class="viz-footer"><span class="viz-title">儿童游乐区节点透视</span><span class="viz-tag">节点</span></div>
+          </div>
+          <div class="viz-card">
+            <img class="viz-img" src="/assets/viz-lawn.jpg" alt="共享草坪节点透视" loading="lazy" />
+            <div class="viz-footer"><span class="viz-title">共享草坪节点透视</span><span class="viz-tag">节点</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── STEP 6: 输出成果 ── -->
+  <div class="step-panel" id="step6">
+    <div class="wb-panel-left">
+      <div class="panel-header">
+        <div class="panel-title">输出成果</div>
+        <div class="panel-desc">设计说明、汇报 PPT、打印版本一键导出</div>
+      </div>
+      <div class="panel-body">
+        <div class="panel-section">
+          <label class="form-label">文档语言</label>
+          <select class="form-select">
+            <option>中文</option><option>中英双语</option><option>English</option>
+          </select>
+        </div>
+        <div class="panel-section">
+          <label class="form-label">PPT 模板风格</label>
+          <select class="form-select">
+            <option>深色专业版</option><option>浅色清晰版</option><option>简约汇报版</option>
+          </select>
+        </div>
+        <div class="panel-section">
+          <label class="form-label">包含章节</label>
+          <div style="display:flex;flex-direction:column;gap:8px;margin-top:4px;">
+            <label style="display:flex;align-items:center;gap:8px;font-size:13px;color:var(--white-60);cursor:pointer;">
+              <input type="checkbox" checked style="accent-color:var(--green);" /> 项目概况与场地分析
+            </label>
+            <label style="display:flex;align-items:center;gap:8px;font-size:13px;color:var(--white-60);cursor:pointer;">
+              <input type="checkbox" checked style="accent-color:var(--green);" /> 设计理念与概念说明
+            </label>
+            <label style="display:flex;align-items:center;gap:8px;font-size:13px;color:var(--white-60);cursor:pointer;">
+              <input type="checkbox" checked style="accent-color:var(--green);" /> 总平面与功能分区
+            </label>
+            <label style="display:flex;align-items:center;gap:8px;font-size:13px;color:var(--white-60);cursor:pointer;">
+              <input type="checkbox" checked style="accent-color:var(--green);" /> 效果图与节点详图
+            </label>
+            <label style="display:flex;align-items:center;gap:8px;font-size:13px;color:var(--white-60);cursor:pointer;">
+              <input type="checkbox" style="accent-color:var(--green);" /> 造价估算与材料清单
+            </label>
+          </div>
+        </div>
+        <button class="btn-run" onclick="runStep6()">✦ 一键打包导出</button>
+      </div>
+    </div>
+    <div class="wb-panel-right">
+      <div class="result-area">
+        <div class="result-area-title">导出格式</div>
+        <div class="output-cards">
+          <div class="output-card">
+            <div class="output-icon">📋</div>
+            <div class="output-name">设计说明</div>
+            <div class="output-desc">Word / PDF 格式，包含设计依据、策略与材料说明</div>
+            <button class="output-btn">导出 DOCX</button>
+          </div>
+          <div class="output-card">
+            <div class="output-icon">🎨</div>
+            <div class="output-name">汇报 PPT</div>
+            <div class="output-desc">16:9 演示文档，含排版好的图文与注释</div>
+            <button class="output-btn">导出 PPTX</button>
+          </div>
+          <div class="output-card">
+            <div class="output-icon">🗺️</div>
+            <div class="output-name">图纸包</div>
+            <div class="output-desc">总平面 + 分析图 + 节点详图 ZIP 压缩包</div>
+            <button class="output-btn">导出 ZIP</button>
+          </div>
+        </div>
+        <div style="margin-top:32px;padding:20px 24px;background:var(--card-bg);border:1px solid var(--border);border-radius:12px;">
+          <div style="font-size:12px;color:var(--white-30);margin-bottom:12px;text-transform:uppercase;letter-spacing:0.1em;">项目进度</div>
+          <div style="display:flex;gap:8px;align-items:center;margin-bottom:8px;">
+            <div style="flex:1;height:4px;background:rgba(34,197,94,0.15);border-radius:2px;">
+              <div style="width:83%;height:100%;background:var(--green);border-radius:2px;"></div>
+            </div>
+            <span style="font-size:12px;color:var(--green);">5/6 步</span>
+          </div>
+          <div style="font-size:12px;color:var(--white-30);">已完成前 5 步，点击导出即可生成完整成果</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /wb-main -->
+
+<script>
+// ── Tab switching ──
+document.querySelectorAll('.step-tab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    document.querySelectorAll('.step-tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.step-panel').forEach(p => p.classList.remove('active'));
+    tab.classList.add('active');
+    document.getElementById('step' + tab.dataset.step).classList.add('active');
+  });
+});
+
+// ── Step 1 ──
+function runStep1() {
+  const name = document.getElementById('s1-name').value || '未命名项目';
+  const type = document.getElementById('s1-type').value;
+  const area = document.getElementById('s1-area').value || '待定';
+  const user = document.getElementById('s1-user').value || '周边居民';
+  const goal = document.getElementById('s1-goal').value || '打造高品质公共空间';
+
+  const r = document.getElementById('s1-result');
+  r.innerHTML = `
+    <div class="result-area-title">项目条件解析</div>
+    <div class="condition-grid">
+      <div class="condition-card">
+        <div class="condition-label">项目名称</div>
+        <div class="condition-val">${name}</div>
+      </div>
+      <div class="condition-card">
+        <div class="condition-label">项目类型</div>
+        <div class="condition-val">${type}</div>
+      </div>
+      <div class="condition-card">
+        <div class="condition-label">场地面积</div>
+        <div class="condition-val">${area} ㎡</div>
+      </div>
+      <div class="condition-card">
+        <div class="condition-label">目标人群</div>
+        <div class="condition-val">${user}</div>
+      </div>
+    </div>
+    <div style="margin-top:20px;background:var(--card-bg);border:1px solid var(--border);border-radius:12px;padding:20px;">
+      <div style="font-size:12px;color:var(--green);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:10px;">AI 识别的核心设计命题</div>
+      <div style="font-size:14px;color:var(--white-60);line-height:1.7;">${goal}</div>
+    </div>
+    <div style="margin-top:12px;text-align:right;">
+      <button onclick="goStep(2)" style="background:transparent;border:1px solid rgba(34,197,94,0.4);color:var(--green);padding:8px 20px;border-radius:8px;cursor:pointer;font-size:13px;">进入概念生成 →</button>
+    </div>`;
+}
+
+// ── Step 2 ──
+function runStep2() {
+  const r = document.getElementById('s2-result');
+  r.innerHTML = `
+    <div class="result-area-title">设计概念分析</div>
+    <div class="concept-grid">
+      <div class="concept-card">
+        <div class="concept-angle">🌤 气候角度</div>
+        <div class="concept-text">利用场地夏季主导风向与降雨特征，通过乔木廊道与透水铺装系统，打造"会呼吸"的景观结构，全年四季皆可舒适使用。</div>
+      </div>
+      <div class="concept-card">
+        <div class="concept-angle">👥 人群角度</div>
+        <div class="concept-text">围绕核心使用者的行为模式差异——老年人晨练、儿童游玩、年轻人休闲打卡——形成时段分区复合使用策略，最大化空间效率。</div>
+      </div>
+      <div class="concept-card">
+        <div class="concept-angle">⚡ 矛盾角度</div>
+        <div class="concept-text">将场地主要矛盾（硬质 vs. 生态，隔离 vs. 连通）转化为设计驱动力：以软化驳岸、建立生态廊道作为核心设计动作。</div>
+      </div>
+      <div class="concept-card">
+        <div class="concept-angle">📚 案例角度</div>
+        <div class="concept-text">参考新加坡碧山公园河道修复策略与成都麓湖生态城滨水带处理手法，提取"蜿蜒 + 台地 + 植物缓冲带"三大空间语言。</div>
+      </div>
+    </div>
+    <div style="margin-top:12px;text-align:right;">
+      <button onclick="goStep(3)" style="background:transparent;border:1px solid rgba(34,197,94,0.4);color:var(--green);padding:8px 20px;border-radius:8px;cursor:pointer;font-size:13px;">进入方案选择 →</button>
+    </div>`;
+}
+
+// ── Step 3 ──
+function runStep3() {
+  const r = document.getElementById('s3-result');
+  r.innerHTML = `
+    <div class="result-area-title">三个方案方向</div>
+    <div class="scheme-grid">
+      <div class="scheme-card" onclick="this.classList.toggle('selected')">
+        <div class="scheme-id">A</div>
+        <div class="scheme-name">生态修复路线</div>
+        <div class="scheme-desc">以自然做功为核心，最小干预恢复场地生态基底。软化驳岸、引入湿地缓冲带、乡土植物群落为主体。</div>
+        <div class="scheme-risk">⚠ 风险：建成初期视觉效果较弱，需 2-3 年成型</div>
+      </div>
+      <div class="scheme-card selected" onclick="this.classList.toggle('selected')">
+        <div class="scheme-id">B</div>
+        <div class="scheme-name">活力公园路线</div>
+        <div class="scheme-desc">以活动策划为驱动，植入全龄运动设施、滨水栈道、户外集会草坪，形成高人气打卡空间。</div>
+        <div class="scheme-risk">✅ 推荐：社区活力高，甲方认可度强</div>
+      </div>
+      <div class="scheme-card" onclick="this.classList.toggle('selected')">
+        <div class="scheme-id">C</div>
+        <div class="scheme-name">文化叙事路线</div>
+        <div class="scheme-desc">挖掘场地历史脉络，以艺术装置、文化廊道、在地植物故事为线索，构建独特的景观叙事体验。</div>
+        <div class="scheme-risk">⚠ 风险：造价较高，需要专项文化研究支撑</div>
+      </div>
+    </div>
+    <div style="margin-top:12px;text-align:right;">
+      <button onclick="goStep(4)" style="background:transparent;border:1px solid rgba(34,197,94,0.4);color:var(--green);padding:8px 20px;border-radius:8px;cursor:pointer;font-size:13px;">进入空间推演 →</button>
+    </div>`;
+}
+
+// ── Step 4 ──
+function runStep4() {
+  const r = document.getElementById('s4-result');
+  r.innerHTML = `
+    <div class="result-area-title">空间推演结果</div>
+    <div class="space-grid">
+      <div class="space-card">
+        <div class="space-card-title">总平面功能分区</div>
+        <ul class="space-list">
+          <li>入口广场区（约 15%）</li>
+          <li>活动草坪区（约 25%）</li>
+          <li>滨水步道区（约 20%）</li>
+          <li>生态种植区（约 30%）</li>
+          <li>服务配套区（约 10%）</li>
+        </ul>
+      </div>
+      <div class="space-card">
+        <div class="space-card-title">流线组织</div>
+        <ul class="space-list">
+          <li>主游览环路：2.4m 宽无障碍</li>
+          <li>滨水慢跑道：1.8m 彩色透水</li>
+          <li>生态游步道：1.2m 碎石铺设</li>
+          <li>无障碍主轴贯通东西</li>
+        </ul>
+      </div>
+      <div class="space-card">
+        <div class="space-card-title">竖向处理</div>
+        <ul class="space-list">
+          <li>入口台阶抬高 0.6m 形成仪式感</li>
+          <li>草坪整体缓坡 1:50</li>
+          <li>驳岸采用三级台地软化</li>
+          <li>亲水平台距水面 ≤ 0.5m</li>
+        </ul>
+      </div>
+      <div class="space-card">
+        <div class="space-card-title">植物结构策略</div>
+        <ul class="space-list">
+          <li>上层：乡土落叶乔木（银杏+乌桕）</li>
+          <li>中层：花灌木季相序列</li>
+          <li>下层：地被草花混播</li>
+          <li>水岸：挺水植物生态缓冲</li>
+        </ul>
+      </div>
+    </div>
+    <div style="margin-top:12px;text-align:right;">
+      <button onclick="goStep(5)" style="background:transparent;border:1px solid rgba(34,197,94,0.4);color:var(--green);padding:8px 20px;border-radius:8px;cursor:pointer;font-size:13px;">进入视觉表达 →</button>
+    </div>`;
+}
+
+// ── Step 5 ──
+function runStep5() {
+  // 图片已默认展示，点击按钮时高亮刷新状态
+  const btn = document.getElementById('s5-btn');
+  btn.textContent = '✓ 效果图已就绪';
+  btn.style.background = 'rgba(34,197,94,0.15)';
+  btn.style.color = 'var(--green)';
+  btn.style.border = '1px solid rgba(34,197,94,0.4)';
+  btn.style.boxShadow = 'none';
+}
+
+// ── Step 6 ──
+function runStep6() {
+  const btns = document.querySelectorAll('.output-btn');
+  btns.forEach(b => {
+    b.textContent = '准备中…';
+    setTimeout(() => { b.textContent = '✓ 已就绪'; b.style.color = 'var(--green)'; }, 1200);
+  });
+}
+
+// ── Step navigation helper ──
+function goStep(n) {
+  document.querySelectorAll('.step-tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.step-panel').forEach(p => p.classList.remove('active'));
+  document.querySelector(`[data-step="${n}"]`).classList.add('active');
+  document.getElementById('step' + n).classList.add('active');
+}
+</script>
+</body>
+</html>

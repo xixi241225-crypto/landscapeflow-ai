@@ -1,0 +1,679 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>LandscapeFlow AI — 让设计师，回到设计本身</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #0A0A0A;
+      --green: #22C55E;
+      --green-glow: rgba(34,197,94,0.4);
+      --white: #FFFFFF;
+      --white-60: rgba(255,255,255,0.60);
+      --white-30: rgba(255,255,255,0.30);
+      --border: rgba(255,255,255,0.10);
+      --card-bg: rgba(255,255,255,0.06);
+      --font-serif: 'Playfair Display', Georgia, serif;
+      --font-sans: 'DM Sans', system-ui, sans-serif;
+    }
+
+    html { scroll-behavior: smooth; }
+    body { background: var(--bg); color: var(--white); font-family: var(--font-sans); line-height: 1.6; overflow-x: hidden; }
+
+    /* ── NAV ── */
+    nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      height: 68px; display: flex; align-items: center; justify-content: space-between;
+      padding: 0 40px;
+      background: rgba(10,10,10,0.75);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--border);
+      transition: background 0.3s;
+    }
+    nav.scrolled { background: rgba(10,10,10,0.95); }
+    .nav-logo {
+      font-family: var(--font-serif);
+      font-size: 18px; font-weight: 600;
+      color: var(--white);
+      text-decoration: none;
+      display: flex; align-items: center; gap: 8px;
+    }
+    .nav-logo span { filter: drop-shadow(0 0 8px var(--green)); }
+    .nav-links { display: flex; align-items: center; gap: 36px; }
+    .nav-links a {
+      font-size: 14px; font-weight: 400;
+      color: var(--white-60); text-decoration: none;
+      transition: color 0.2s;
+      letter-spacing: 0.02em;
+    }
+    .nav-links a:hover { color: var(--white); }
+    .nav-actions { display: flex; align-items: center; gap: 12px; }
+    .btn-ghost {
+      padding: 8px 20px; border-radius: 24px;
+      border: 1px solid var(--border);
+      background: transparent; color: var(--white-60);
+      font-family: var(--font-sans); font-size: 14px; cursor: pointer;
+      transition: all 0.2s; text-decoration: none;
+    }
+    .btn-ghost:hover { border-color: var(--white-30); color: var(--white); }
+    .btn-green {
+      padding: 8px 22px; border-radius: 24px;
+      background: linear-gradient(135deg, #16A34A, #22C55E);
+      color: #fff; font-family: var(--font-sans); font-size: 14px;
+      font-weight: 500; cursor: pointer; border: none;
+      text-decoration: none; transition: opacity 0.2s;
+      box-shadow: 0 0 20px rgba(34,197,94,0.3);
+    }
+    .btn-green:hover { opacity: 0.88; }
+
+    /* ── HERO ── */
+    #hero {
+      position: relative; height: 100vh; min-height: 680px;
+      overflow: hidden;
+    }
+    .hero-slides { position: absolute; inset: 0; }
+    .hero-slide {
+      position: absolute; inset: 0;
+      background-size: cover; background-position: center;
+      opacity: 0; transition: opacity 1.2s ease;
+      transform: scale(1.06);
+      animation: none;
+    }
+    .hero-slide.active {
+      opacity: 1;
+      animation: zoomOut 5s ease forwards;
+    }
+    @keyframes zoomOut {
+      from { transform: scale(1.06); }
+      to   { transform: scale(1.00); }
+    }
+    .hero-mask {
+      position: absolute; inset: 0;
+      background: linear-gradient(
+        rgba(10,10,10,0.64) 0%,
+        rgba(10,10,10,0.28) 32%,
+        rgba(10,10,10,0.30) 58%,
+        rgba(10,10,10,0.86) 100%
+      );
+      z-index: 1;
+    }
+    .hero-content {
+      position: absolute; z-index: 2;
+      bottom: 22%; left: 50%;
+      transform: translateX(-50%);
+      text-align: center;
+      width: 100%; max-width: 860px;
+      padding: 0 24px;
+    }
+    .hero-content .eyebrow {
+      font-family: var(--font-serif);
+      font-size: 22px; font-weight: 400;
+      letter-spacing: 0.06em;
+      color: var(--green); margin-bottom: 20px;
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+    }
+    .hero-title {
+      font-family: var(--font-serif);
+      font-size: clamp(36px, 4vw, 64px);
+      font-weight: 700; line-height: 1.02;
+      color: var(--white); margin-bottom: 24px;
+      white-space: nowrap;
+    }
+    .hero-title em { font-style: italic; color: var(--green); }
+    @media (max-width: 600px) {
+      .hero-title {
+        white-space: normal;
+        font-size: clamp(32px, 8vw, 48px);
+      }
+    }
+    .hero-sub {
+      font-size: 16px; color: var(--white-60);
+      max-width: 620px; margin: 0 auto 36px;
+      line-height: 1.75;
+    }
+    .hero-cta {
+      display: inline-block;
+      padding: 14px 36px; border-radius: 32px;
+      background: linear-gradient(135deg, #16A34A, #22C55E);
+      color: #fff; font-size: 16px; font-weight: 500;
+      text-decoration: none;
+      box-shadow: 0 0 32px rgba(34,197,94,0.45);
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .hero-cta:hover { transform: translateY(-2px); box-shadow: 0 0 48px rgba(34,197,94,0.6); }
+    .hero-dots {
+      position: absolute; bottom: 32px; left: 50%; transform: translateX(-50%);
+      z-index: 2; display: flex; gap: 10px;
+    }
+    .hero-dot {
+      width: 8px; height: 8px; border-radius: 50%;
+      background: var(--white-30); cursor: pointer;
+      transition: background 0.3s, transform 0.3s;
+      border: none;
+    }
+    .hero-dot.active { background: var(--green); transform: scale(1.3); }
+
+    /* ── SECTION COMMON ── */
+    section { padding: 120px 40px; }
+    .section-inner { max-width: 1160px; margin: 0 auto; }
+    .section-eyebrow { font-family: var(--font-sans); font-size: 12px; font-weight: 500; letter-spacing: 0.18em; text-transform: uppercase; color: var(--green); margin-bottom: 20px; }
+    .section-title { font-family: var(--font-serif); font-size: clamp(36px, 3.5vw, 56px); font-weight: 700; line-height: 1.1; color: var(--white); margin-bottom: 16px; }
+    .section-sub { font-size: 16px; color: var(--white-60); max-width: 560px; line-height: 1.75; margin-bottom: 64px; }
+
+    /* ── REVEAL ── */
+    .reveal { opacity: 0; transform: translateY(32px); transition: opacity 0.7s ease, transform 0.7s ease; }
+    .reveal.visible { opacity: 1; transform: translateY(0); }
+
+    /* ── REVOLUTION ── */
+    #revolution { background: var(--bg); }
+    .rev-cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; }
+    .rev-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 16px; padding: 40px 32px;
+      transition: transform 0.3s, box-shadow 0.3s;
+      position: relative; overflow: hidden;
+    }
+    .rev-card:hover { transform: translateY(-6px); box-shadow: 0 0 48px var(--green-glow); }
+    .rev-era {
+      font-family: var(--font-sans); font-size: 11px; font-weight: 500;
+      letter-spacing: 0.14em; text-transform: uppercase;
+      color: var(--green); margin-bottom: 16px;
+    }
+    .rev-title {
+      font-family: var(--font-serif); font-size: 26px; font-weight: 600;
+      color: var(--white); margin-bottom: 28px; line-height: 1.25;
+    }
+    .rev-rows { display: flex; flex-direction: column; gap: 12px; }
+    .rev-row { display: flex; gap: 12px; }
+    .rev-label { font-size: 12px; color: var(--white-30); width: 60px; flex-shrink: 0; line-height: 1.5; }
+    .rev-val { font-size: 14px; color: var(--white-60); line-height: 1.5; }
+    .rev-note {
+      margin-top: 28px; padding-top: 20px;
+      border-top: 1px solid var(--border);
+      font-size: 13px; color: var(--white-60);
+    }
+    .rev-card.highlight .rev-note {
+      font-family: var(--font-serif); font-style: italic;
+      color: var(--green); font-size: 14px;
+    }
+    .rev-card.highlight { border-color: rgba(34,197,94,0.3); }
+
+    /* ── WORKFLOW ── */
+    #workflow { background: rgba(255,255,255,0.02); }
+    .wf-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; }
+    .wf-card {
+      background: var(--card-bg); border: 1px solid var(--border);
+      border-radius: 16px; padding: 36px 32px;
+      transition: transform 0.3s, border-color 0.3s;
+    }
+    .wf-card:hover { transform: translateY(-4px); border-color: rgba(34,197,94,0.3); }
+    .wf-num {
+      font-family: var(--font-serif); font-size: 56px; font-weight: 700;
+      color: rgba(34,197,94,0.25); line-height: 1; margin-bottom: 16px;
+    }
+    .wf-title {
+      font-family: var(--font-serif); font-size: 22px; font-weight: 600;
+      color: var(--white); margin-bottom: 10px;
+    }
+    .wf-desc { font-size: 14px; color: var(--white-60); margin-bottom: 20px; line-height: 1.65; }
+    .wf-tags { display: flex; flex-wrap: wrap; gap: 8px; }
+    .wf-tag {
+      font-size: 11px; padding: 4px 10px; border-radius: 12px;
+      background: rgba(34,197,94,0.12); color: var(--green);
+      border: 1px solid rgba(34,197,94,0.25);
+    }
+
+    /* ── TEMPLATES ── */
+    #templates { background: var(--bg); }
+    .tmpl-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; }
+    .tmpl-card {
+      background: var(--card-bg); border: 1px solid var(--border);
+      border-radius: 16px; overflow: hidden;
+      transition: transform 0.3s, box-shadow 0.3s;
+      cursor: pointer;
+    }
+    .tmpl-card:hover { transform: translateY(-6px); box-shadow: 0 0 40px var(--green-glow); }
+    .tmpl-img {
+      width: 100%; height: 200px; object-fit: cover;
+      background: #1a1a1a;
+      display: block;
+    }
+    .tmpl-body { padding: 20px 22px; }
+    .tmpl-tag {
+      display: inline-block; font-size: 11px; font-weight: 500;
+      padding: 3px 10px; border-radius: 10px;
+      background: rgba(34,197,94,0.15); color: var(--green);
+      border: 1px solid rgba(34,197,94,0.3);
+      margin-bottom: 10px;
+    }
+    .tmpl-name { font-family: var(--font-serif); font-size: 18px; font-weight: 600; color: var(--white); margin-bottom: 8px; }
+    .tmpl-meta { font-size: 12px; color: var(--white-30); }
+    .tmpl-loading { text-align: center; padding: 60px; color: var(--white-30); font-size: 14px; }
+
+    /* ── TRY ── */
+    #try { background: rgba(255,255,255,0.02); }
+    .try-layout { display: grid; grid-template-columns: 1fr 1fr; gap: 48px; }
+    .form-group { margin-bottom: 20px; }
+    .form-label { font-size: 13px; color: var(--white-60); margin-bottom: 8px; display: block; }
+    .form-input, .form-select, .form-textarea {
+      width: 100%; padding: 12px 16px;
+      background: var(--card-bg); border: 1px solid var(--border);
+      border-radius: 10px; color: var(--white);
+      font-family: var(--font-sans); font-size: 14px;
+      outline: none; transition: border-color 0.2s;
+    }
+    .form-input:focus, .form-select:focus, .form-textarea:focus { border-color: rgba(34,197,94,0.5); }
+    .form-select option { background: #1a1a1a; }
+    .form-textarea { resize: vertical; min-height: 100px; }
+    .btn-submit {
+      width: 100%; padding: 14px;
+      background: linear-gradient(135deg, #16A34A, #22C55E);
+      color: #fff; font-family: var(--font-sans); font-size: 15px;
+      font-weight: 500; border: none; border-radius: 12px;
+      cursor: pointer; transition: opacity 0.2s;
+      box-shadow: 0 0 24px rgba(34,197,94,0.35);
+    }
+    .btn-submit:hover { opacity: 0.88; }
+    .btn-submit:disabled { opacity: 0.5; cursor: not-allowed; }
+    .result-box {
+      background: var(--card-bg); border: 1px solid var(--border);
+      border-radius: 16px; padding: 32px;
+      min-height: 380px; display: flex; flex-direction: column;
+    }
+    .result-title { font-size: 13px; color: var(--white-30); margin-bottom: 16px; letter-spacing: 0.1em; text-transform: uppercase; }
+    .result-content {
+      flex: 1; font-size: 14px; color: var(--white-60);
+      line-height: 1.8; white-space: pre-wrap;
+    }
+    .result-placeholder { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; gap: 12px; color: var(--white-30); }
+    .result-placeholder svg { opacity: 0.3; }
+
+    /* ── CTA + FOOTER ── */
+    #cta {
+      background: radial-gradient(ellipse at 50% 60%, rgba(34,197,94,0.12) 0%, transparent 70%), var(--bg);
+      text-align: center; padding: 140px 40px;
+    }
+    .cta-title { font-family: var(--font-serif); font-size: clamp(40px, 4vw, 68px); font-weight: 700; line-height: 1.05; margin-bottom: 20px; }
+    .cta-sub { font-size: 16px; color: var(--white-60); margin-bottom: 40px; max-width: 480px; margin-left: auto; margin-right: auto; }
+    .btn-cta {
+      display: inline-block; padding: 18px 56px; border-radius: 40px;
+      background: linear-gradient(135deg, #16A34A, #22C55E);
+      color: #fff; font-size: 18px; font-weight: 500;
+      text-decoration: none; border: none; cursor: pointer;
+      box-shadow: 0 0 48px rgba(34,197,94,0.5);
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .btn-cta:hover { transform: translateY(-3px); box-shadow: 0 0 64px rgba(34,197,94,0.65); }
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 40px 40px;
+      display: flex; align-items: center; justify-content: space-between;
+      flex-wrap: wrap; gap: 16px;
+    }
+    .footer-logo { font-family: var(--font-serif); font-size: 16px; color: var(--white-60); }
+    .footer-links { display: flex; gap: 24px; }
+    .footer-links a { font-size: 13px; color: var(--white-30); text-decoration: none; transition: color 0.2s; }
+    .footer-links a:hover { color: var(--white-60); }
+    .footer-copy { font-size: 12px; color: var(--white-30); }
+
+    @media (max-width: 900px) {
+      nav { padding: 0 20px; }
+      .nav-links { display: none; }
+      section { padding: 80px 20px; }
+      .rev-cards, .wf-grid, .tmpl-grid { grid-template-columns: 1fr; }
+      .try-layout { grid-template-columns: 1fr; }
+      footer { flex-direction: column; align-items: flex-start; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ── NAV ── -->
+<nav id="navbar">
+  <a href="/" class="nav-logo"><span>🌿</span> LandscapeFlow AI</a>
+  <div class="nav-links">
+    <a href="#revolution">设计革命</a>
+    <a href="#workflow">工作流程</a>
+    <a href="#templates">模板库</a>
+    <a href="#try">AI 试用</a>
+  </div>
+  <div class="nav-actions">
+    <a href="#" class="btn-ghost">登录</a>
+    <a href="workbench.html" class="btn-green">免费试用</a>
+  </div>
+</nav>
+
+<!-- ── HERO ── -->
+<section id="hero">
+  <div class="hero-slides" id="heroSlides">
+    <div class="hero-slide active" style="background-image:url('/assets/tmpl-coast.jpg')"></div>
+    <div class="hero-slide" style="background-image:url('/assets/tmpl-playground.jpg')"></div>
+    <div class="hero-slide" style="background-image:url('/assets/tmpl-pocket.jpg')"></div>
+    <div class="hero-slide" style="background-image:url('/assets/tmpl-commercial.jpg')"></div>
+    <div class="hero-slide" style="background-image:url('/assets/tmpl-community.jpg')"></div>
+    <div class="hero-slide" style="background-image:url('/assets/tmpl-wetland.jpg')"></div>
+  </div>
+  <div class="hero-mask"></div>
+  <div class="hero-content">
+    <div class="eyebrow"><span>🌿</span> LandscapeFlow AI</div>
+    <h1 class="hero-title">让设计师，回到设计本身</h1>
+    <p class="hero-sub">
+      从踏勘记录到汇报 PPT，景观设计师的全流程 AI 工作台。<br/>
+      三次生产力革命之后，时间终于回到观察土地、思考人居、想象未来。
+    </p>
+    <a href="workbench.html" class="hero-cta">进入工作台 →</a>
+  </div>
+  <div class="hero-dots" id="heroDots">
+    <button class="hero-dot active" data-idx="0"></button>
+    <button class="hero-dot" data-idx="1"></button>
+    <button class="hero-dot" data-idx="2"></button>
+    <button class="hero-dot" data-idx="3"></button>
+    <button class="hero-dot" data-idx="4"></button>
+    <button class="hero-dot" data-idx="5"></button>
+  </div>
+</section>
+
+<!-- ── REVOLUTION ── -->
+<section id="revolution">
+  <div class="section-inner">
+    <div class="section-eyebrow reveal">THE THIRD REVOLUTION</div>
+    <h2 class="section-title reveal">设计师的三次生产力革命</h2>
+    <p class="section-sub reveal">每一次，时间都被还给了设计本身</p>
+    <div class="rev-cards">
+      <div class="rev-card reveal">
+        <div class="rev-era">第一次革命</div>
+        <div class="rev-title">手绘时代</div>
+        <div class="rev-rows">
+          <div class="rev-row"><span class="rev-label">时间花在</span><span class="rev-val">在纸上磨手艺</span></div>
+          <div class="rev-row"><span class="rev-label">设计师</span><span class="rev-val">是工匠</span></div>
+        </div>
+        <div class="rev-note">时间在画笔上</div>
+      </div>
+      <div class="rev-card reveal">
+        <div class="rev-era">第二次革命</div>
+        <div class="rev-title">CAD 时代</div>
+        <div class="rev-rows">
+          <div class="rev-row"><span class="rev-label">时间花在</span><span class="rev-val">在记软件命令</span></div>
+          <div class="rev-row"><span class="rev-label">设计师</span><span class="rev-val">是制图员</span></div>
+        </div>
+        <div class="rev-note">时间在快捷键上</div>
+      </div>
+      <div class="rev-card highlight reveal">
+        <div class="rev-era">第三次革命</div>
+        <div class="rev-title">AI 时代</div>
+        <div class="rev-rows">
+          <div class="rev-row"><span class="rev-label">时间花在</span><span class="rev-val">用自然语言对话</span></div>
+          <div class="rev-row"><span class="rev-label">设计师</span><span class="rev-val">回到设计本身</span></div>
+        </div>
+        <div class="rev-note">时间在土地上、在人身上</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── WORKFLOW ── -->
+<section id="workflow">
+  <div class="section-inner">
+    <div class="section-eyebrow reveal">WORKFLOW</div>
+    <h2 class="section-title reveal">从一句话到一份完整方案</h2>
+    <p class="section-sub reveal">六个 AI Agent，把一周压缩到 30 分钟</p>
+    <div class="wf-grid">
+      <div class="wf-card reveal">
+        <div class="wf-num">01</div>
+        <div class="wf-title">项目定义</div>
+        <div class="wf-desc">用关键条件建立项目前提：场地、人群、尺度、目标</div>
+        <div class="wf-tags"><span class="wf-tag">任务书解读</span><span class="wf-tag">用户画像</span><span class="wf-tag">边界识别</span></div>
+      </div>
+      <div class="wf-card reveal">
+        <div class="wf-num">02</div>
+        <div class="wf-title">概念生成</div>
+        <div class="wf-desc">从气候、人群、矛盾、案例四角度建立设计依据</div>
+        <div class="wf-tags"><span class="wf-tag">SWOT</span><span class="wf-tag">案例匹配</span><span class="wf-tag">设计推导</span></div>
+      </div>
+      <div class="wf-card reveal">
+        <div class="wf-num">03</div>
+        <div class="wf-title">方案选择</div>
+        <div class="wf-desc">三个差异化概念方向，每个都是决策节点而非结果</div>
+        <div class="wf-tags"><span class="wf-tag">多方案对比</span><span class="wf-tag">决策建议</span><span class="wf-tag">风险标注</span></div>
+      </div>
+      <div class="wf-card reveal">
+        <div class="wf-num">04</div>
+        <div class="wf-title">空间推演</div>
+        <div class="wf-desc">平面布局、流线组织、竖向、植物结构</div>
+        <div class="wf-tags"><span class="wf-tag">总平面</span><span class="wf-tag">功能分区</span><span class="wf-tag">种植策略</span></div>
+      </div>
+      <div class="wf-card reveal">
+        <div class="wf-num">05</div>
+        <div class="wf-title">视觉表达</div>
+        <div class="wf-desc">节点透视、鸟瞰、效果图、材料板</div>
+        <div class="wf-tags"><span class="wf-tag">文生图</span><span class="wf-tag">风格控制</span><span class="wf-tag">多视角</span></div>
+      </div>
+      <div class="wf-card reveal">
+        <div class="wf-num">06</div>
+        <div class="wf-title">输出成果</div>
+        <div class="wf-desc">设计说明文本、汇报 PPT、打印版本一键导出</div>
+        <div class="wf-tags"><span class="wf-tag">PPT 生成</span><span class="wf-tag">文本润色</span><span class="wf-tag">格式适配</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── TEMPLATES ── -->
+<section id="templates">
+  <div class="section-inner">
+    <div class="section-eyebrow reveal">TEMPLATES</div>
+    <h2 class="section-title reveal">专业模板，覆盖核心场景</h2>
+    <p class="section-sub reveal">6 类景观项目模板，开箱即用</p>
+    <div class="tmpl-grid" id="tmplGrid">
+      <div class="tmpl-loading">正在加载模板库…</div>
+    </div>
+  </div>
+</section>
+
+<!-- ── TRY ── -->
+<section id="try">
+  <div class="section-inner">
+    <div class="section-eyebrow reveal">TRY IT NOW</div>
+    <h2 class="section-title reveal">输入项目信息，AI 立即生成项目说明</h2>
+    <div class="try-layout">
+      <div class="reveal">
+        <form id="briefForm">
+          <div class="form-group">
+            <label class="form-label">项目名称</label>
+            <input class="form-input" type="text" id="projectName" placeholder="例：滨江休闲带景观改造" required />
+          </div>
+          <div class="form-group">
+            <label class="form-label">项目类型</label>
+            <select class="form-select" id="projectType">
+              <option>滨水景观</option>
+              <option>城市公园</option>
+              <option>社区绿地</option>
+              <option>商业街区</option>
+              <option>儿童乐园</option>
+              <option>生态修复</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">用地面积（㎡）</label>
+            <input class="form-input" type="text" id="area" placeholder="例：12000" required />
+          </div>
+          <div class="form-group">
+            <label class="form-label">设计风格</label>
+            <select class="form-select" id="style">
+              <option>现代简约</option>
+              <option>自然生态</option>
+              <option>新中式</option>
+              <option>工业风</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">核心目标</label>
+            <textarea class="form-textarea" id="goal" placeholder="例：为周边 3 万居民提供高品质滨水公共空间，重点解决现有硬质驳岸的生态修复与亲水性不足问题"></textarea>
+          </div>
+          <button type="submit" class="btn-submit" id="submitBtn">✦ 生成项目说明</button>
+        </form>
+      </div>
+      <div class="reveal">
+        <div class="result-box">
+          <div class="result-title">AI 生成结果</div>
+          <div class="result-content" id="resultContent">
+            <div class="result-placeholder">
+              <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                <path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/>
+              </svg>
+              <span>填写左侧表单后点击生成</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── CTA + FOOTER ── -->
+<section id="cta">
+  <div class="section-inner" style="max-width:640px">
+    <div class="section-eyebrow" style="justify-content:center;display:flex">START NOW</div>
+    <h2 class="cta-title">现在开始<br/><em style="font-style:italic;color:var(--green)">你的设计</em></h2>
+    <p class="cta-sub">无需下载，打开浏览器即可工作。免费计划包含 5 次完整方案生成。</p>
+    <a href="workbench.html" class="btn-cta">免费开始生成</a>
+  </div>
+</section>
+
+<footer>
+  <div class="footer-logo">🌿 LandscapeFlow AI</div>
+  <div class="footer-links">
+    <a href="#revolution">设计革命</a>
+    <a href="#workflow">工作流程</a>
+    <a href="#templates">模板库</a>
+    <a href="#try">AI 试用</a>
+    <a href="workbench.html">工作台</a>
+  </div>
+  <div class="footer-copy">© 2025 LandscapeFlow AI. 让设计师回到设计本身。</div>
+</footer>
+
+<script>
+// ── Hero Slideshow ──
+(function() {
+  const slides = document.querySelectorAll('.hero-slide');
+  const dots = document.querySelectorAll('.hero-dot');
+  let current = 0;
+  let timer = null;
+  let paused = false;
+
+  function goTo(idx) {
+    slides[current].classList.remove('active');
+    dots[current].classList.remove('active');
+    current = (idx + slides.length) % slides.length;
+    slides[current].classList.add('active');
+    dots[current].classList.add('active');
+  }
+
+  function next() { if (!paused) goTo(current + 1); }
+
+  function start() { timer = setInterval(next, 5000); }
+  function stop()  { clearInterval(timer); }
+
+  document.getElementById('hero').addEventListener('mouseenter', () => { paused = true; });
+  document.getElementById('hero').addEventListener('mouseleave', () => { paused = false; });
+
+  dots.forEach(d => {
+    d.addEventListener('click', () => {
+      stop(); goTo(+d.dataset.idx); start();
+    });
+  });
+
+  start();
+})();
+
+// ── Navbar Scroll ──
+window.addEventListener('scroll', () => {
+  document.getElementById('navbar').classList.toggle('scrolled', window.scrollY > 40);
+});
+
+// ── Reveal on Scroll ──
+const revealEls = document.querySelectorAll('.reveal');
+const observer = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if (e.isIntersecting) { e.target.classList.add('visible'); observer.unobserve(e.target); }
+  });
+}, { threshold: 0.12 });
+revealEls.forEach(el => observer.observe(el));
+
+// ── Load Templates ──
+async function loadTemplates() {
+  const grid = document.getElementById('tmplGrid');
+  try {
+    const res = await fetch('/api/cases');
+    const data = await res.json();
+    if (!data.success || !data.cases) throw new Error('no data');
+    grid.innerHTML = data.cases.map(c => `
+      <div class="tmpl-card reveal">
+        <img class="tmpl-img" src="${c.img}" alt="${c.name}" loading="lazy" />
+        <div class="tmpl-body">
+          ${c.tag ? `<div class="tmpl-tag">${c.tag}</div>` : ''}
+          <div class="tmpl-name">${c.name}</div>
+          <div class="tmpl-meta">${c.meta}</div>
+        </div>
+      </div>
+    `).join('');
+    // re-observe new cards
+    grid.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+  } catch(e) {
+    grid.innerHTML = '<div class="tmpl-loading">模板加载失败，请刷新重试</div>';
+  }
+}
+loadTemplates();
+
+// ── Brief Form ──
+document.getElementById('briefForm').addEventListener('submit', async function(e) {
+  e.preventDefault();
+  const btn = document.getElementById('submitBtn');
+  const result = document.getElementById('resultContent');
+  btn.disabled = true;
+  btn.textContent = '生成中…';
+  result.innerHTML = '<div style="color:var(--white-30);font-size:14px;">AI 正在思考…</div>';
+
+  try {
+    const res = await fetch('/api/brief', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        projectName: document.getElementById('projectName').value,
+        projectType: document.getElementById('projectType').value,
+        area: document.getElementById('area').value,
+        style: document.getElementById('style').value,
+        goal: document.getElementById('goal').value
+      })
+    });
+    const data = await res.json();
+    if (!data.success) throw new Error('api error');
+
+    // Typewriter effect
+    result.innerHTML = '';
+    result.style.whiteSpace = 'pre-wrap';
+    const text = data.brief;
+    let i = 0;
+    function type() {
+      if (i < text.length) {
+        result.textContent += text[i++];
+        setTimeout(type, 25);
+      }
+    }
+    type();
+  } catch(err) {
+    result.textContent = '生成失败，请稍后重试';
+  } finally {
+    btn.disabled = false;
+    btn.textContent = '✦ 重新生成';
+  }
+});
+</script>
+</body>
+</html>
